@@ -15,6 +15,6 @@ libro cerca_libro_nella_lista(libri lista, const char titolo_chiave[]);
 int modifica_libro_nella_lista(libri lista, const char titolo_attuale[], const char nuovo_titolo[], const char nuovo_nome_autore[], const char nuovo_cognome_autore[]);
 int cancella_libro_dalla_lista(libri* lista, const char titolo_chiave[]);
 int distruggi_lista_libri(libri* lista);
-void stampa__lista_libri(libri lista);
+void stampa_lista_libri(libri lista);
 
 #endif
