@@ -1,20 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "libri.h"
 
 
 int crea_lista_Libri(libri* lista) {
     *lista = NULL;
-    return 0; // Successo
+    return 0; 
 }
 
 int inserisci_nuovo_libro(libri* lista, const char titolo[], const char nome_autore[], const char cognome_autore[]) {
+    
     libri nuovo_libro = (libri)malloc(sizeof(struct Libri));
+    
     if (nuovo_libro == NULL) {
         return 1; // Errore di allocazione
     }
+    
     nuovo_libro->l = (libro)malloc(sizeof(struct libro));
+    
     set_titolo(nuovo_libro->l, titolo);
     set_nome_autore(nuovo_libro->l, nome_autore);
     set_cognome_autore(nuovo_libro->l, cognome_autore);
@@ -25,18 +30,14 @@ int inserisci_nuovo_libro(libri* lista, const char titolo[], const char nome_aut
     libri corrente = *lista;
     libri precedente = NULL;
 
-    // Scorre la lista per trovare la posizione corretta
-    while (corrente != NULL) {
-        char titolo_corrente[100];
-        get_titolo(corrente->l, titolo_corrente);
-        if (strcmp(titolo_nuovo, titolo_corrente) < 0) {
-            break; // Trovato il punto di inserimento
-        }
+    
+    while (corrente != NULL && strcmp(corrente->l->titolo,titolo_nuovo) > 0) {
+        
         precedente = corrente;
         corrente = corrente->successivo;
+        
     }
 
-    // Inserisce il nodo
     if (precedente == NULL) { // Inserimento in testa
         nuovo_libro->successivo = *lista;
         *lista = nuovo_libro;
@@ -45,25 +46,32 @@ int inserisci_nuovo_libro(libri* lista, const char titolo[], const char nome_aut
         nuovo_libro->successivo = corrente;
     }
 
-    return 0; // Successo
+    return 0; 
 }
 
 
 libro cerca_libro_nella_lista(libri lista, const char titolo_chiave[]) {
+    
     while (lista != NULL) {
+        
         char titolo[100];
         get_titolo(lista->l, titolo);
+        
         if (strcmp(titolo, titolo_chiave) == 0) {
             return lista->l; // Libro trovato
         }
+        
         lista = lista->successivo;
     }
+
     return NULL; // Libro non trovato
 }
 
 //Se passo parametri vuoti vuol dire che non voglio effettuare modifiche
 int modifica_libro_nella_lista(libri lista, const char titolo_attuale[], const char nuovo_titolo[], const char nuovo_nome_autore[], const char nuovo_cognome_autore[]) {
+    
     libro l = cerca_libro_nella_lista(lista, titolo_attuale);
+    
     if (l == NULL) {
         return 1; // Libro non trovato
     }
@@ -80,27 +88,34 @@ int modifica_libro_nella_lista(libri lista, const char titolo_attuale[], const c
         set_cognome_autore(l, nuovo_cognome_autore);
     }
 
-    return 0; // Successo
+    return 0; 
 }
 
 
 int cancella_libro_dalla_lista(libri* lista, const char titolo_chiave[]) {
+    
     libri corrente = *lista;
     libri precedente = NULL;
 
     while (corrente != NULL) {
+    
         char titolo[100];
         get_titolo(corrente->l, titolo);
+    
         if (strcmp(titolo, titolo_chiave) == 0) {
+    
             if (precedente == NULL) {
                 *lista = corrente->successivo; // Rimuove il primo elemento
             } else {
                 precedente->successivo = corrente->successivo; // Rimuove l'elemento corrente
             }
+    
             distruggi_libro(&corrente->l); // Libera la memoria del libro
             free(corrente); // Libera la memoria della struttura Libri
-            return 0; // Successo
+    
+            return 0; 
         }
+    
         precedente = corrente;
         corrente = corrente->successivo;
     }
@@ -109,29 +124,25 @@ int cancella_libro_dalla_lista(libri* lista, const char titolo_chiave[]) {
 
 
 int distruggi_lista_libri(libri* lista) {
+    
     libri corrente = *lista;
     while (corrente != NULL) {
+    
         libri da_cancellare = corrente;
         corrente = corrente->successivo;
-        distruggi_libro(&da_cancellare->l); // Libera la memoria del libro
-        free(da_cancellare); // Libera la memoria della struttura Libri
+        distruggi_libro(&da_cancellare->l); 
+        free(da_cancellare);
     }
-    *lista = NULL; // Imposta la lista a NULL
-    return 0; // Successo
+
+    *lista = NULL; // Imposta la lista a NULL (vuota)
+    return 0; 
 }
 
 
 void stampa_lista_libri(libri lista) {
+    
     while (lista != NULL) {
-        char titolo[100];
-        char nome_autore[50];
-        char cognome_autore[50];
-
-        get_titolo(lista->l, titolo);
-        get_nome_autore(lista->l, nome_autore);
-        get_cognome_autore(lista->l, cognome_autore);
-
-        printf("Titolo: %s, Autore: %s %s\n", titolo, nome_autore, cognome_autore);
+        stampa_libro(lista->l);
         lista = lista->successivo;
     }
 }

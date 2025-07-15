@@ -1,34 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "persone.h"
 
 int crea_lista_persone(persone* lista) {
+    
     if (lista == NULL) {
-        return 1; // Errore: puntatore nullo
+        return 1;
     }
     
-    *lista = NULL; // Inizializza la lista come vuota
-    return 0; // Successo
+    *lista = NULL; 
+    return 0;
 }
 
 
 int inserisci_nuova_persona(persone* lista, const char nome[], const char cognome[]) {
     
     persona p_da_inserire;
+    
     if (crea_persona(&p_da_inserire, nome, cognome) != 0) {
         return 1;
     }
-
     persone nuovo_nodo = (persone)malloc(sizeof(struct persone));
+    
     if (nuovo_nodo == NULL) {
         distruggi_persona(&p_da_inserire);
         return 1;
     }
+    
     nuovo_nodo->p = p_da_inserire;
 
     persone corrente = *lista;
     persone precedente = NULL;
+    
     while (corrente != NULL && strcmp(nome, corrente->p->nome) > 0) {
         precedente = corrente;
         corrente = corrente->successivo;
@@ -41,37 +46,42 @@ int inserisci_nuova_persona(persone* lista, const char nome[], const char cognom
         precedente->successivo = nuovo_nodo;
         nuovo_nodo->successivo = corrente;
     }
+
     return 0;
 }
 
 
 persona cerca_persona_nella_lista(persone lista, const char cognome_chiave[]) {
+    
     if (lista == NULL || cognome_chiave == NULL) {
-        return NULL; // Errore: puntatore nullo
+        return NULL;
     }
     
     persone corrente = lista;
+    
     while (corrente != NULL) {
         char cognome[50];
         get_cognome_persona(corrente->p, cognome);
         
         if (strcmp(cognome, cognome_chiave) == 0) {
-            return corrente->p; // Persona trovata
+            return corrente->p; 
         }
         
         corrente = corrente->successivo;
     }
     
-    return NULL; // Persona non trovata
+    return NULL; 
 }
 
 
 int modifica_persona_nella_lista(persone lista, const char cognome_attuale[], const char nuovo_nome[], const char nuovo_cognome[]) {
+    
     if (lista == NULL || cognome_attuale == NULL || nuovo_nome == NULL || nuovo_cognome == NULL) {
-        return 1; // Errore: puntatore nullo
+        return 1;
     }
     
     persone corrente = lista;
+    
     while (corrente != NULL) {
         char cognome[50];
         get_cognome_persona(corrente->p, cognome);
@@ -79,19 +89,20 @@ int modifica_persona_nella_lista(persone lista, const char cognome_attuale[], co
         if (strcmp(cognome, cognome_attuale) == 0) {
             set_nome_persona(corrente->p, nuovo_nome);
             set_cognome_persona(corrente->p, nuovo_cognome);
-            return 0; // Successo
+            return 0;
         }
         
         corrente = corrente->successivo;
     }
     
-    return 1; // Persona non trovata
+    return 1; 
 }
 
 
 int cancella_persona_dalla_lista(persone* lista, const char cognome_chiave[]) {
+    
     if (lista == NULL || *lista == NULL || cognome_chiave == NULL) {
-        return 1; // Errore: puntatore nullo
+        return 1;
     }
     
     persone corrente = *lista;
@@ -109,23 +120,24 @@ int cancella_persona_dalla_lista(persone* lista, const char cognome_chiave[]) {
             }
             distruggi_persona(&corrente->p); // Libera la memoria della persona
             free(corrente); // Libera la memoria del nodo
-            return 0; // Successo
+            return 0;
         }
         
         precedente = corrente;
         corrente = corrente->successivo;
     }
     
-    return 1; // Persona non trovata
+    return 1; 
 }
 
 
 int distruggi_lista_persone(persone* lista) {
     if (lista == NULL || *lista == NULL) {
-        return 1; // Errore: puntatore nullo
+        return 1;
     }
     
     persone corrente = *lista;
+    
     while (corrente != NULL) {
         persone da_cancellare = corrente;
         corrente = corrente->successivo;
@@ -133,8 +145,8 @@ int distruggi_lista_persone(persone* lista) {
         free(da_cancellare); // Libera la memoria del nodo
     }
     
-    *lista = NULL; // Imposta la lista come vuota
-    return 0; // Successo
+    *lista = NULL;
+    return 0;
 }
 
 

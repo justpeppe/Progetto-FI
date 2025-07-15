@@ -17,7 +17,7 @@ libro get_libro_del_prestito(prestito p, libro* l_cerca); // modifica aggiunta d
 int set_data_del_prestito(prestito p, const char nuova_data[]);
 int set_libro_del_prestito(prestito p, libro nuovo_l_associato);
 
-int aggiorna_puntatore_libro_prestito(prestito p, libro vecchio_libro, libro nuovo_libro);
+//int aggiorna_puntatore_libro_prestito(prestito p, libro vecchio_libro, libro nuovo_libro);
 
 int distruggi_prestito(prestito* p);
 

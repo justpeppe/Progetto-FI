@@ -5,34 +5,43 @@
 #include "prestito.h"
 
 int crea_prestito(prestito* nuovo_prestito, const char data[], libro l_associato) {
+
     *nuovo_prestito = (prestito)malloc(sizeof(struct prestito));
+    
     if (*nuovo_prestito == NULL) {
         return 1;
     }
+    
     strcpy((*nuovo_prestito)->data_prestito, data);
     (*nuovo_prestito)->libro_associato = l_associato;
+    
     return 0;
 }
 
+
 int get_data_del_prestito(prestito p, char data[]) {
+    
     if (p == NULL || data == NULL) {
-        return 1; // Errore
+        return 1; 
     }
     
     strcpy(data, p->data_prestito);
-    return 0; // Successo
+    return 0; 
 }
+
 
 libro get_libro_del_prestito(prestito p, libro* l_cerca) {
     if (p == NULL || l_cerca == NULL) {
-        return NULL; // Errore
+        return NULL; 
     }
     
     *l_cerca = p->libro_associato;
-    return *l_cerca; // Successo
+    return *l_cerca; 
 }
 
+
 int set_data_del_prestito(prestito p, const char nuova_data[]) {
+    
     if (p == NULL || nuova_data == NULL) {
         return 1;
     }
@@ -41,26 +50,15 @@ int set_data_del_prestito(prestito p, const char nuova_data[]) {
     return 0;
 }
 
+
 int set_libro_del_prestito(prestito p, libro nuovo_l_associato) {
+    
     if (p == NULL || nuovo_l_associato == NULL) {
         return 1;
     }
     
     p->libro_associato = nuovo_l_associato;
     return 0;
-}
-
-int aggiorna_puntatore_libro_prestito(prestito p, libro vecchio_libro, libro nuovo_libro) {
-    if (p == NULL || vecchio_libro == NULL || nuovo_libro == NULL) {
-        return 1;
-    }
-    
-    if (p->libro_associato == vecchio_libro) {
-        p->libro_associato = nuovo_libro;
-        return 0;
-    }
-    
-    return 1;
 }
 
 int distruggi_prestito(prestito* p) {
@@ -84,7 +82,7 @@ int stampa_prestito(prestito p) {
     libro l;
     get_libro_del_prestito(p, &l);
     if (l == NULL) {
-        return 1; // Errore nel recupero del libro associato
+        return 1;  
     }
     
     char titolo[100];
