@@ -9,28 +9,34 @@ int crea_lista_prestiti(prestiti* lista) {
 }
 
 
-int inserisci_nuovo_prestito(prestiti* lista, char data[], libro l_associato) {
-    prestiti nuovo_prestito = (prestiti)malloc(sizeof(struct prestiti));
-    if (nuovo_prestito == NULL) {
-        return 1; // Errore di allocazione
-    }
-    
-    nuovo_prestito->p = (prestito)malloc(sizeof(struct prestito));
-    if (nuovo_prestito->p == NULL) {
-        free(nuovo_prestito);
-        return 1; // Errore di allocazione
-    }
-
-    if (crea_prestito(&nuovo_prestito->p, data, l_associato) != 0) {
-        free(nuovo_prestito->p);
-        free(nuovo_prestito);
+int inserisci_nuovo_prestito(prestiti* lista, const char data[], libro l_associato) {
+    prestito p_da_inserire;
+    if (crea_prestito(&p_da_inserire, data, l_associato) != 0) {
         return 1; // Errore nella creazione del prestito
     }
+    
+    prestiti nuovo_nodo = (prestiti)malloc(sizeof(struct prestiti));
+    if (nuovo_nodo == NULL) {
+        distruggi_prestito(&p_da_inserire); // Pulisci se fallisce
+        return 1;
+    }
+    nuovo_nodo->p = p_da_inserire;
+    
+    prestiti corrente = *lista;
+    prestiti precedente = NULL;
+    while (corrente != NULL && strcmp(data, corrente->p->data_prestito) > 0) {
+        precedente = corrente;
+        corrente = corrente->successivo;
+    }
 
-    nuovo_prestito->successivo = *lista;
-    *lista = nuovo_prestito;
-
-    return 0; // Successo
+    if (precedente == NULL) { // Inserimento in testa
+        nuovo_nodo->successivo = *lista;
+        *lista = nuovo_nodo;
+    } else { // Inserimento in mezzo o in coda
+        precedente->successivo = nuovo_nodo;
+        nuovo_nodo->successivo = corrente;
+    }
+    return 0;
 }
 
 
@@ -117,24 +123,16 @@ int distruggi_lista_prestiti(prestiti* lista) {
 
 
 void stampa_lista_prestiti(prestiti lista) {
+    if (lista == NULL) {
+        printf("Nessun prestito per questo utente.\n");
+        return;
+    }
     while (lista != NULL) {
-        char data[11];
-        get_data_del_prestito(lista->p, data);
-        
-        libro l;
-        get_libro_del_prestito(lista->p, &l);
-        if (l == NULL) {
-            printf("Errore nel recupero del libro associato.\n");
-            return;
-        }
-        
-        char titolo[100];
-        get_titolo(l, titolo);
-        printf("Prestito:\n");
-        printf("Data: %s\n", data);
-        printf("Libro associato: %s\n", titolo);
+        stampa_prestito(lista->p);
+        printf("---\n");
         lista = lista->successivo;
     }
+
     printf("Fine della lista dei prestiti.\n");
 }
 

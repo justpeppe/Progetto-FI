@@ -3,7 +3,7 @@
 #include <string.h>
 #include "libro.h"
 
-int crea_libro(libro* nuovo_libro, char titolo[], char nome_autore[], const char cognome_autore[]) {  
+int crea_libro(libro* nuovo_libro, const char titolo[], const char nome_autore[], const char cognome_autore[]) {  
     *nuovo_libro = (libro)malloc(sizeof(struct libro));
     if (*nuovo_libro == NULL) {
         return 1; // Errore di allocazione

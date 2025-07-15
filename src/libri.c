@@ -9,7 +9,7 @@ int crea_lista_Libri(libri* lista) {
     return 0; // Successo
 }
 
-int inserisci_nuovo_libro(libri* lista, char titolo[], char nome_autore[], char cognome_autore[]) {
+int inserisci_nuovo_libro(libri* lista, const char titolo[], const char nome_autore[], const char cognome_autore[]) {
     libri nuovo_libro = (libri)malloc(sizeof(struct Libri));
     if (nuovo_libro == NULL) {
         return 1; // Errore di allocazione
@@ -49,7 +49,7 @@ int inserisci_nuovo_libro(libri* lista, char titolo[], char nome_autore[], char 
 }
 
 
-libro cerca_libro_nella_lista(libri lista, char titolo_chiave[]) {
+libro cerca_libro_nella_lista(libri lista, const char titolo_chiave[]) {
     while (lista != NULL) {
         char titolo[100];
         get_titolo(lista->l, titolo);
@@ -62,7 +62,7 @@ libro cerca_libro_nella_lista(libri lista, char titolo_chiave[]) {
 }
 
 //Se passo parametri vuoti vuol dire che non voglio effettuare modifiche
-int modifica_libro_nella_lista(libri lista, char titolo_attuale[], char nuovo_titolo[], char nuovo_nome_autore[], char nuovo_cognome_autore[]) {
+int modifica_libro_nella_lista(libri lista, const char titolo_attuale[], const char nuovo_titolo[], const char nuovo_nome_autore[], const char nuovo_cognome_autore[]) {
     libro l = cerca_libro_nella_lista(lista, titolo_attuale);
     if (l == NULL) {
         return 1; // Libro non trovato
@@ -84,7 +84,7 @@ int modifica_libro_nella_lista(libri lista, char titolo_attuale[], char nuovo_ti
 }
 
 
-int cancella_libro_dalla_lista(libri* lista, char titolo_chiave[]) {
+int cancella_libro_dalla_lista(libri* lista, const char titolo_chiave[]) {
     libri corrente = *lista;
     libri precedente = NULL;
 
@@ -121,7 +121,7 @@ int distruggi_lista_libri(libri* lista) {
 }
 
 
-void stampa__lista_libri(libri lista) {
+void stampa_lista_libri(libri lista) {
     while (lista != NULL) {
         char titolo[100];
         char nome_autore[50];
