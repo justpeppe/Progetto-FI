@@ -23,7 +23,7 @@ int stampa_menu()
     printf("Seleziona un'azione: ");
     if (fgets(buffer, sizeof(buffer), stdin) != NULL)
     {
-        scelta = atoi(buffer); // atoi -> converte stringa in intero (fatto con scanf rimaneva /n alla fine e veniva dato come input al sottomenù)
+        scelta = atoi(buffer); // atoi (ascii to integer) -> converte stringa in intero (fatto con scanf rimaneva /n alla fine e veniva dato come input alla prossima funzione)
     }
 
     return scelta;
