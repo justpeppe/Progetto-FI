@@ -34,7 +34,7 @@ int inserisci_nuova_persona(persone* lista, const char nome[], const char cognom
     persone corrente = *lista;
     persone precedente = NULL;
     
-    while (corrente != NULL && strcmp(nome, corrente->p->nome) > 0) {
+    while (corrente != NULL && strcmp(cognome, corrente->p->cognome) < 0) {
         precedente = corrente;
         corrente = corrente->successivo;
     }

@@ -104,25 +104,24 @@ int modifica_prestito_nella_lista(prestiti lista, const char data_attuale[], con
 }
 
 
-int cancella_prestito_dalla_lista(prestiti* lista, const char data_chiave[]) {
+int cancella_prestito_dalla_lista(prestiti* lista, libro l_associato) {
     
     prestiti corrente = *lista;
     prestiti precedente = NULL;
 
     while (corrente != NULL) {
-    
-        char data[11];
-        get_data_del_prestito(corrente->p, data);
-    
-        if (strcmp(data, data_chiave) == 0) {
+        libro libro_corrente;
+        get_libro_del_prestito(corrente->p, &libro_corrente);
+
+        if (libro_corrente == l_associato) {
             if (precedente == NULL) {
-                *lista = corrente->successivo; // Rimuove il primo elemento
+                *lista = corrente->successivo; 
             } else {
-                precedente->successivo = corrente->successivo; // Rimuove l'elemento corrente
+                precedente->successivo = corrente->successivo; 
             }
             
-            distruggi_prestito(&corrente->p); // Libera la memoria del prestito
-            free(corrente); // Libera la memoria della struttura Prestiti
+            distruggi_prestito(&corrente->p); 
+            free(corrente); 
             return 0; 
         }
         

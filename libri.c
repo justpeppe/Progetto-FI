@@ -19,6 +19,10 @@ int inserisci_nuovo_libro(libri* lista, const char titolo[], const char nome_aut
     }
     
     nuovo_libro->l = (libro)malloc(sizeof(struct libro));
+    if (nuovo_libro->l == NULL) {
+        free(nuovo_libro);
+        return 1;
+    }
     
     set_titolo(nuovo_libro->l, titolo);
     set_nome_autore(nuovo_libro->l, nome_autore);
@@ -31,7 +35,7 @@ int inserisci_nuovo_libro(libri* lista, const char titolo[], const char nome_aut
     libri precedente = NULL;
 
     
-    while (corrente != NULL && strcmp(corrente->l->titolo,titolo_nuovo) > 0) {
+    while (corrente != NULL && strcmp(corrente->l->titolo,titolo_nuovo) < 0) { // "<" ordinamento crescente
         
         precedente = corrente;
         corrente = corrente->successivo;

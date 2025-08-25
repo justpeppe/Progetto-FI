@@ -59,6 +59,23 @@ int is_libro_in_prestito(persone lista_utenti, libro libro_da_controllare)
     return 0;
 }
 
+persona trova_persona_per_libro_in_prestito(persone lista_utenti, libro libro_cercato)
+{
+    while (lista_utenti != NULL)
+    {
+        prestiti *p_lista_prestiti = get_prestiti_della_persona(lista_utenti->p);
+        if (p_lista_prestiti != NULL)
+        {
+            if (cerca_prestito_nella_lista_per_libro(*p_lista_prestiti, libro_cercato) != NULL)
+            {
+                return lista_utenti->p;
+            }
+        }
+        lista_utenti = lista_utenti->successivo;
+    }
+    return NULL;
+}
+
 // 1. Inserisci nuovo libro
 void gestisci_inserimento_libro(libri *lista_libri)
 {
@@ -111,16 +128,11 @@ void gestisci_modifica_libro(libri *lista_libri)
 
     // Aggiorna solo i campi non vuoti
     if (strlen(nuovo_titolo) > 0)
-        strncpy(libro_da_modificare->titolo, nuovo_titolo, sizeof(libro_da_modificare->titolo) - 1);
+        set_titolo(libro_da_modificare, nuovo_titolo);
     if (strlen(nuovo_nome_autore) > 0)
-        strncpy(libro_da_modificare->nome_autore, nuovo_nome_autore, sizeof(libro_da_modificare->nome_autore) - 1);
+        set_nome_autore(libro_da_modificare, nuovo_nome_autore);
     if (strlen(nuovo_cognome_autore) > 0)
-        strncpy(libro_da_modificare->cognome_autore, nuovo_cognome_autore, sizeof(libro_da_modificare->cognome_autore) - 1);
-
-    // Assicurati che le stringhe siano terminate correttamente
-    libro_da_modificare->titolo[sizeof(libro_da_modificare->titolo) - 1] = '\0';
-    libro_da_modificare->nome_autore[sizeof(libro_da_modificare->nome_autore) - 1] = '\0';
-    libro_da_modificare->cognome_autore[sizeof(libro_da_modificare->cognome_autore) - 1] = '\0';
+        set_cognome_autore(libro_da_modificare, nuovo_cognome_autore);
 
     printf("Libro modificato con successo!\n");
 }
@@ -198,12 +210,9 @@ void gestisci_modifica_utente(persone *lista_utenti)
     nuovo_cognome[strcspn(nuovo_cognome, "\n")] = 0;
 
     if (strlen(nuovo_nome) > 0)
-        strncpy(utente->nome, nuovo_nome, sizeof(utente->nome) - 1);
+        set_nome_persona(utente, nuovo_nome);
     if (strlen(nuovo_cognome) > 0)
-        strncpy(utente->cognome, nuovo_cognome, sizeof(utente->cognome) - 1);
-
-    utente->nome[sizeof(utente->nome) - 1] = '\0';
-    utente->cognome[sizeof(utente->cognome) - 1] = '\0';
+        set_cognome_persona(utente, nuovo_cognome);
 
     printf("Dati utente modificati con successo!\n");
 }
@@ -289,35 +298,28 @@ void gestisci_registrazione_prestito(persone lista_utenti, libri lista_libri)
 }
 
 // 9. Modifica prestito esistente
-void gestisci_modifica_prestito(persone lista_utenti)
+void gestisci_modifica_prestito(persone lista_utenti, libri lista_libri)
 {
-    char cognome_utente[50], data_prestito[11];
-    printf("Inserisci cognome dell'utente: ");
-    leggi_stringa(cognome_utente, 50);
+    char titolo_libro[100];
+    printf("Inserisci il titolo del libro associato al prestito da modificare: ");
+    leggi_stringa(titolo_libro, 100);
 
-    persona utente = cerca_persona_nella_lista(lista_utenti, cognome_utente);
-    if (utente == NULL)
+    libro libro_corrente = cerca_libro_nella_lista(lista_libri, titolo_libro);
+    if (libro_corrente == NULL)
     {
-        printf("Errore: utente non trovato.\n");
+        printf("Libro non trovato.\n");
         return;
     }
 
-    prestiti *p_lista_prestiti = get_prestiti_della_persona(utente);
-    if (p_lista_prestiti == NULL || *p_lista_prestiti == NULL)
+    // Cerca il prestito e l'utente che lo possiede
+    persona utente_trovato = trova_persona_per_libro_in_prestito(lista_utenti, libro_corrente);
+    if (utente_trovato == NULL)
     {
-        printf("L'utente non ha prestiti da modificare.\n");
+        printf("Prestito non trovato per il libro specificato.\n");
         return;
     }
-
-    printf("Inserisci la data del prestito da modificare (AAAA-MM-GG): ");
-    leggi_stringa(data_prestito, 11);
-
-    prestito p = cerca_prestito_nella_lista_per_data(*p_lista_prestiti, data_prestito);
-    if (p == NULL)
-    {
-        printf("Prestito non trovato per la data specificata.\n");
-        return;
-    }
+    prestiti *p_lista_prestiti = get_prestiti_della_persona(utente_trovato);
+    prestito p = cerca_prestito_nella_lista_per_libro(*p_lista_prestiti, libro_corrente);
 
     char nuova_data[11];
     printf("Inserisci la nuova data del prestito (AAAA-MM-GG, lascia vuoto per non modificare): ");
@@ -326,44 +328,71 @@ void gestisci_modifica_prestito(persone lista_utenti)
 
     if (strlen(nuova_data) > 0)
     {
-        strncpy(p->data_prestito, nuova_data, sizeof(p->data_prestito) - 1);
-        p->data_prestito[sizeof(p->data_prestito) - 1] = '\0';
+        set_data_del_prestito(p, nuova_data);
+    }
+
+    char nuovo_titolo_libro[100];
+    printf("Inserisci il nuovo titolo del libro (lascia vuoto per non modificare): ");
+    fgets(nuovo_titolo_libro, 100, stdin);
+    nuovo_titolo_libro[strcspn(nuovo_titolo_libro, "\n")] = 0;
+
+    if (strlen(nuovo_titolo_libro) > 0)
+    {
+        libro nuovo_libro = cerca_libro_nella_lista(lista_libri, nuovo_titolo_libro);
+        if (nuovo_libro == NULL)
+        {
+            printf("Nuovo libro non trovato. Il libro associato non è stato modificato.\n");
+        }
+        else if (is_libro_in_prestito(lista_utenti, nuovo_libro))
+        {
+            printf("Il nuovo libro è già in prestito. Il libro associato non è stato modificato.\n");
+        }
+        else
+        {
+            set_libro_del_prestito(p, nuovo_libro);
+        }
     }
 
     printf("Prestito modificato con successo!\n");
 }
 
+
 // 10. Elimina prestito
-void gestisci_elimina_prestito(persone lista_utenti)
+void gestisci_elimina_prestito(persone lista_utenti, libri lista_principale_libri)
 {
-    char cognome_utente[50], data_prestito[11];
-    printf("Inserisci cognome dell'utente: ");
-    leggi_stringa(cognome_utente, 50);
+    char titolo_libro[100];
+    printf("Inserisci il titolo del libro del prestito da eliminare: ");
+    leggi_stringa(titolo_libro, 100);
 
-    persona utente = cerca_persona_nella_lista(lista_utenti, cognome_utente);
-    if (utente == NULL)
+    libro libro_corrente = cerca_libro_nella_lista(lista_principale_libri, titolo_libro);
+
+    if (libro_corrente == NULL)
     {
-        printf("Errore: utente non trovato.\n");
+        printf("Libro non trovato.\n");
         return;
     }
 
-    printf("Inserisci data del prestito da eliminare (AAAA-MM-GG): ");
-    leggi_stringa(data_prestito, 11);
-
-    prestiti *p_lista_prestiti_utente = get_prestiti_della_persona(utente);
-    if (p_lista_prestiti_utente == NULL)
+    persona utente_trovato = trova_persona_per_libro_in_prestito(lista_utenti, libro_corrente);
+    if (utente_trovato == NULL)
     {
-        printf("Errore interno nel recuperare la lista prestiti.\n");
+        printf("Prestito non trovato per il libro specificato.\n");
+        return;
+    }
+    prestiti *p_lista_prestiti_utente = get_prestiti_della_persona(utente_trovato);
+    prestito p = cerca_prestito_nella_lista_per_libro(*p_lista_prestiti_utente, libro_corrente);
+    if (p == NULL)
+    {
+        printf("Prestito non trovato per il libro specificato.\n");
         return;
     }
 
-    if (cancella_prestito_dalla_lista(p_lista_prestiti_utente, data_prestito) == 0)
+    if (cancella_prestito_dalla_lista(p_lista_prestiti_utente, libro_corrente) == 0)
     {
         printf("Prestito eliminato con successo!\n");
     }
     else
     {
-        printf("Errore: prestito non trovato per la data specificata.\n");
+        printf("Errore: prestito non trovato per il libro specificato.\n");
     }
 }
 
@@ -408,10 +437,10 @@ int main()
             gestisci_registrazione_prestito(lista_principale_utenti, lista_principale_libri);
             break;
         case 9:
-            gestisci_modifica_prestito(lista_principale_utenti);
+            gestisci_modifica_prestito(lista_principale_utenti, lista_principale_libri);
             break;
         case 10:
-            gestisci_elimina_prestito(lista_principale_utenti);
+            gestisci_elimina_prestito(lista_principale_utenti, lista_principale_libri);
             break;
         case 11:
             stampa_lista_persone(lista_principale_utenti);
