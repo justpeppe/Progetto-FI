@@ -88,9 +88,8 @@ int stampa_prestito(prestito p) {
     char titolo[100];
     get_titolo(l, titolo);
     
-    printf("Prestito:\n");
-    printf("Data: %s\n", data);
     printf("Libro associato: %s\n", titolo);
+    printf("Data: %s\n", data);
     
     return 0;
 }
